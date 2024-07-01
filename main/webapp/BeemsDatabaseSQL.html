@@ -1,0 +1,847 @@
+DROP DATABASE IF EXISTS beems;
+
+CREATE DATABASE IF NOT EXISTS beems;
+USE beems;
+
+CREATE TABLE IF NOT EXISTS departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    department_id INT NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+);
+
+CREATE TABLE IF NOT EXISTS terms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    term_name VARCHAR(100) NOT NULL UNIQUE,
+    abbreviation VARCHAR(100),
+    reading VARCHAR(100),
+    definition TEXT,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    search_count INT DEFAULT 0,
+    request_date TIMESTAMP DEFAULT NULL,
+    helped_count INT DEFAULT 0,
+    last_editor INT,
+    request_deletion BOOLEAN DEFAULT FALSE,
+    remarks TEXT,
+    key_term BOOLEAN DEFAULT FALSE,
+    department_id INT NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES departments(id),
+    FOREIGN KEY(last_editor) REFERENCES users(id) 
+);
+
+CREATE TABLE IF NOT EXISTS search_logs (
+    term_id INT,
+    user_id INT,
+    search_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (term_id) REFERENCES terms(id),
+    PRIMARY KEY (user_id,term_id)
+);
+
+CREATE TABLE IF NOT EXISTS register_logs (
+    term_id INT,
+    user_id INT,
+    search_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (term_id) REFERENCES terms(id),
+    PRIMARY KEY (user_id,term_id)
+);
+
+CREATE TABLE IF NOT EXISTS display_counts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    count INT DEFAULT 5
+);
+
+
+COMMIT;
+
+
+INSERT INTO departments (department_name) values ('出向部'),('経営企画室'),('総務部'),('IT経営基盤統括部'),('戦略事業部'),('金融第一事業部'),('金融第二事業部'),('DXソリューション事業部'),('産業第一事業部'),('産業第二事業部'),('BEEms管理部門'),('一般用語'),('リクエスト');
+INSERT INTO display_counts (count) VALUES (5);
+
+
+INSERT INTO users (id, username, password, department_id) values (1111111,'一般ユーザー1','D/4avRoIIVNTwjPW4AlhPpXuxCU4Mqdhryj/N6xaFQw=',1);
+INSERT INTO users (id, username, password, department_id) values (2222222,'一般ユーザー2','7e4p+IJUO5VmILJtDuDn6VA5mxxCIvXeBeBkJbTJlek=',1);
+INSERT INTO users (id, username, password, department_id) values (3333333,'一般ユーザー3','MYruP+2MnQQNNaf8H6d2+zEwODOqLeiFNU3fPUTY+2k=',1);
+INSERT INTO users (id, username, password, department_id) values (4444444,'一般ユーザー4','efBvj94zNGFznyIAkKI8sqefbXFL7hANDktK8kkpRhk=',1);
+INSERT INTO users (id, username, password, department_id) values (5555555,'管理ユーザー1','wfMw0K/zHByHQD8eQ0e8whr/fBeZCHI1NfKzFyNwJSU=',11);
+
+
+INSERT INTO terms (term_name,request_date, remarks, department_id)
+VALUES ('BEEms', '2024-02-10 10:41:59.995000', 'このサイトについて教えてください', 13);
+
+INSERT INTO terms (term_name,request_date, remarks, department_id)
+VALUES ('福利厚生', '2024-06-10 10:41:59.995000', 'MDISの福利厚生について教えてください', 13);
+
+INSERT INTO terms (term_name,request_date, department_id)
+VALUES ('MDランチ', '2024-04-13 10:41:59.995000',13);
+
+INSERT INTO terms (term_name,request_date, department_id)
+VALUES ('テクノウェア', '2024-02-10 10:41:59.995000', 13);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部西日本営業部中部営業課', '中営', 'さんぎょうだいいちじぎょうぶにしにほんえいぎょうぶちゅうぶえいぎょうか', '中部地区製造業･流通サービス業向け情報システム/サービスのマーケティング及び販売に関する事項｡', '2024-01-08 11:13:45', 0, NULL, 0, 1111111, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部西日本営業部中部', '西日本営', 'さんぎょうだいいちじぎょうぶにしにほんえいぎょうぶちゅうぶ', '西日本地区の製造業、流通サービス業向けマーケティング及び営業に関する事項。', '2024-01-07 11:13:45', 0, NULL, 0, 2222222, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部西日本営業部関西営業課', '西営', 'さんぎょうだいいちじぎょうぶにしにほんえいぎょうぶちゅうぶかんさいえいぎょうか', '関西地区以西の製造業・流通サービス業向け情報システム/サービスのマーケティング及び販売に関する事項。', '2024-01-09 11:13:45', 0, NULL, 0, 2222222, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部コンサルティング部', '産業コンサル',  'さんぎょうだいいちじぎょうぶこんさるてぃんぐぶ', '製造業、流通サービス業の新規顧客/既存顧客向け経営管理から工場管理すべてにわたる業務DX/情報システム/サービスを中心とした受注活動、企画、コンサルティング、教育に関する事項｡', '2024-03-04 14:15:46', 0, NULL, 0, 3333333, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部ISERPプロジェクト部', 'Iプロ',  'さんぎょうだいいちじぎょうぶあいさーぷぷろじぇくとぶ', 'ISERPプロジェクトの受注活動、企画、コンサルティング、開発、設計、製作、保守並びに事業損益管理に関する事項｡', '2024-03-05 14:15:46', 0, NULL, 0, 5555555, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部製造DX推進課', 'DI製造',  'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶせいぞうでぃえっくすすいしんか', '製造業顧客向け全般にわたる、製造DXシステム構築/サービス提供のマーケティング、商談活動、アライアンス活動、受注工事全般に関する事項。', '2024-03-07 14:15:46', 0, NULL, 0, 1111111, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部', 'DIシ', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶ', '製造業の新規顧客/既存顧客向け経営管理から工場管理すべてにわたる製造業DXを中心とした情報システム/サービスを中心とした受注活動、企画、コンサルティング、開発、設計、製作、保守並びに事業損益管理に関する事項｡', '2024-03-06 14:15:46', 0, NULL, 0, 5555555, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部第一課', 'DIシ1', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶだいいっか', '製造業の新規顧客/既存顧客向け経営管理における情報システム構築を中心とした受注活動、企画、コンサルティング、開発、設計、製作、保守に関する事項。', '2024-03-08 14:15:46', 0, NULL, 0, 4444444, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部第二課', 'DIシ2', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶだいにか', '製造業の新規顧客/既存顧客/三菱電機及びグループ向け経営管理におけるコンバージョン、製造業DXを中心とした情報システム構築/サービス提供を中心とした受注活動、企画、コンサルティング、開発、設計、製作、保守、及びアウトソーシングに関する事項。', '2024-03-09 14:15:46', 0, NULL, 0, 3333333, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部第三課', 'DIシ3', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶだいさんか', '既存顧客の経営管理から工場管理すべてにわたるAMO、顧客サポート、アプリケーション運用保守並びに事業損益管理に関する事項｡', '2024-03-10 14:15:46', 0, NULL, 0, 4444444, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部第四課', 'DIシ4', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶだいよんか', '主に中部地区以西の製造業の新規顧客/既存顧客/三菱電機及びグループ向け経営管理から工場管理すべてにわたる製造業DXを中心とした情報システム/サービスを中心とした受注活動、企画、コンサルティング、開発、設計、製作、保守、及びアウトソーシング並びに事業損益管理に関する事項｡', '2024-03-11 14:15:46', 0, NULL, 0, 2222222, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・システム部第五課', 'DIシ5', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・しすてむぶだいごか', '製造業の新規顧客/既存顧客/三菱電機及びグループ向け工場管理、製造業DXを中心とした情報システム構築/サービス提供を中心とした受注活動、企画、コンサルティング、開発、設計、製作、保守に関する事項。', '2024-03-12 14:15:46', 0, NULL, 0, 5555555, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・営業部', 'DI営', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・えいぎょうぶ', '製造業顧客向け経営管理、工場管理、IoT、インフラなど製造DXシステム構築/サービス提供のマーケティング及び営業全般に関する事項。', '2024-01-03 11:13:45', 0, NULL, 0, 4444444, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・営業部第一課', 'DI営1', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・えいぎょうぶだいいっか', '一般製造業の主に新規顧客/三菱電機及びグループ向けDXソリューション(ERPソリューション(主にSAP)、ITとFA分野を連携させたソリューション)の新規顧客を中心とした情報システム/サービスのマーケティング及び販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-01-04 11:13:45', 0, NULL, 0, 1111111, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・営業部第二課', 'DI営2', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・えいぎょうぶだいにか', '一般製造業の新規顧客/既存顧客/三菱電機及びグループ向けDXソリューション(カーボンニュートラルソリューション)、経営管理におけるコンバージョンの情報システム/サービスのマーケティング及び販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-01-05 11:13:45', 0, NULL, 0, 1111111, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第一事業部DXインダストリー・営業部第三課', 'DI営3', 'さんぎょうだいいちじぎょうぶでぃえっくすいんだすとりー・えいぎょうぶだいさんか', '一般製造業の主に既存顧客/三菱電機及びグループ向けDXソリューション(ERPソリューション(主にSAP)、ITとFA分野を連携させたソリューション)の既存顧客を中心とした情報システム/サービスのマーケティング及び販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-01-06 11:13:45', 0, NULL, 0, 5555555, 9);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部', 'EPシ1', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶ', 'エンタープライズ顧客向けサービス、ソリューション向け及び中部地区顧客への受注前活動、企画、コンサルティング、設計、製作、保守に関する事項。', '2024-06-06 10:56:00', 0, NULL, 0, 1111111, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部第一課', 'EPシ11', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶだいいっか', 'JAL、ANA、空港情報、及び流通サービス業向けの情報システムの受注前活動、企画、コンサルティング、設計、製作、保守等のシステムエンジニアリングに関する事項。', '2024-06-07 10:56:00', 0, NULL, 0, 3333333, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部第二課', 'EPシ12', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶだいにか', '映像解析ソリューションの企画、開発、製品化、受注前活動、コンサルティング、設計、製作、保守等のシステムエンジニアリングに関する事項。', '2024-02-08 10:42:00', 0, NULL, 0, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部第三課', 'EPシ13', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶだいさんか', 'イオンG向け受注前活動、企画、コンサルティング、設計、製作、保守等のシステムエンジニアリングに関する事項。', '2024-02-09 10:41:59.995000', 0, NULL, 0, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部第四課', 'EPシ14', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶだいよんか', '通信放送事業分野全般に於ける情報システムのコンサル、設計、開発、保守に関する事項｡', '2024-02-10 10:41:59.995000', 0, NULL, 0, 1111111, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第一部第五課', 'EPシ15', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいいちぶだいごか', '中部地区に於ける外販ビジネスを中心とした受注前活動、企画、コンサルティング、設計、製作、保守等のシステムエンジニアリングに関する事項。', '2024-02-11 10:41:59.995000', 0, NULL, 0, 3333333, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第二部', 'EPシ2', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいにぶ', '三菱自動車工業(株)向けシステム構築/サービス提供の受注活動、企画、コンサルティング、開発、設計、製作、保守、及びアウトソーシング並びに事業損益管理に関する事項｡', '2024-02-13 10:41:59.995000', 0, NULL, 0, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第二部第一課', 'EPシ21', 'さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいにぶだいいっか', '三菱自動車工業(株)の販売会社を中心に情報システム/サービスのマーケティング及び販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-02-14 10:41:59.995000', 0, NULL, 0, 1111111, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズシステム第二部第二課', 'EPシ22','さんぎょうだいにじぎょうぶえんたーぷらいずしすてむだいにぶだいにか', '三菱自動車工業(株)および関連会社の情報システム/サービスのマーケティング及び販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-02-15 10:41:59.995000', 0, NULL, 0, 2222222, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズ営業部', 'EP営', 'さんぎょうだいにじぎょうぶえんたーぷらいずえいぎょうぶ', '航空会社、デベロッパー、通信放送、電機MX等のエンタープライズ顧客向け情報システム事業に関する事項。', '2024-05-26 10:56:00', 0, NULL, 0, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズ営業部第一課', 'EP営1', 'さんぎょうだいにじぎょうぶえんたーぷらいずえいぎょうぶだいいっか', '映像解析ソリューション(kizkia)の販売、及びエアライン、空港ビル向け情報システムのマーケティング、販売に関する事項｡　', '2024-05-27 10:56:00', 0, NULL, 0, 2222222, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズ営業部第二課', 'EP営2', 'さんぎょうだいにじぎょうぶえんたーぷらいずえいぎょうぶだいにか', 'イオンモール向けアウトソーシングサービスの提供と情報システムのマーケティング、販売に関する事項。', '2024-05-28 10:56:00', 0, NULL, 0, 3333333, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズ営業部第三課', 'EP営3', 'さんぎょうだいにじぎょうぶえんたーぷらいずえいぎょうぶだいさんか', 'KDDIを主とした通信・放送分野の顧客向け情報システムの販売及び不動産分野顧客向け情報システムのマーケティング、販売に関する事項。', '2024-05-29 10:56:00', 0, NULL, 0, 2222222, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部エンタープライズ営業部第四課', 'EP営4', 'さんぎょうだいにじぎょうぶえんたーぷらいずえいぎょうぶだいよんか', '三菱自動車工業(株)を中心とする自動車会社及び販売会社向け情報システムのマーケティング、販売、並びに当該分野に関する全国支社取りまとめに関する事項｡', '2024-05-30 10:56:00', 0, NULL, 0, 5555555, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部M-Xプロジェクト部', '産業MX', 'さんぎょうだいにじぎょうぶえむーえっくすぷろじぇくとぶ', '三菱電機Ｉ改本向けM-X関連プロジェクトの受注活動、企画、コンサルティング、開発、設計、製作、保守に関する事項。', '2024-05-31 10:56:00', 0, NULL, 0, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('kizkia-Knight', 'kizkia', 'きずきあ', '映像解析ソリューション”kizkia”（きずきあ）。製品概要（AIによって映像からリアルタイムで検知したいヒト・モノ・コトを自動的に検出。これまで手動でおこなってきた監視作業を自動化し業務効率の向上が実現可能）。弱者サポート機能として、車椅子・白杖者を検知し、サポートが必要な人をみつけて通知する。', '2024-05-31 10:56:00', 100, NULL, 1, 4444444, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('産業第二事業部DX推進プロジェクト部', '産業DX', 'さんぎょうだいにじぎょうぶでぃーえっくすすいしんぷろじぇくとぶ', '三菱電機の製造DX化に向けた推進計画の立案・策定・推進と製造事業拡大の計画立案・策定に関する事項。', '2024-05-24 10:56:00', 0, NULL, 0, 3333333,10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('産業第二事業部', '産2事', 'さんぎょうだいにじぎょうぶ', '航空会社、商社、デベロッパー、通信放送、三菱自工、及び販売会社等の産業サービス業顧客向け情報システム事業及び三菱電機業務ＤＸに関する事項。', '2024-05-23 10:56:00', 0, NULL, 0, 1111111, 10, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('T-MeCSS', NULL,'てぃーめっくす' , '健康診断の支援サービス。', '2024-06-04 10:56:00', 0, NULL, 0, 1111111, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('Privacy Policy Manager', 'PPM2', 'ぷらいばしー ぽりしー まねーじゃー', '新同意情報管理システム。企業が顧客の同意情報を一元管理するシステム。', '2024-06-03 10:56:00', 0, NULL, 0, 5555555, 10);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('KDDI Owned Media Planning And Strategy','kompas', 'けーでぃーでぃーあい おうんど めでぃあ ぷらんにんぐ あんど すとらてじー', 'Webポータル共通基盤。KDDIのコンテンツ作成を含めたWebサイト構築プラットフォーム。', '2024-06-02 10:56:00', 0, NULL, 0, 3333333, 10);
+
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室経理部調査課', '調査','けいえいきかくしつけいりぶちょうさか' , '全社の経営管理、損益管理、及び予算管理等に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室経理部原価課', '原価', 'けいえいきかくしつけいりぶげんかか', 'BUの原価管理、費用構造管理、及び損益管理等に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室経理部会計課', '会計', 'けいえいきかくしつけいりぶかいけいか', '全社の決算、資金管理、関係会社管理、及び監査･税務調査の受入等に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室経理部', '経理部', 'けいえいきかくしつけいりぶ', '全社に於ける経理、財務等に関する事項', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室企画部業務課', '業務','けいえいきかくしつきかくぶぎょうむか', 'アラインス推進、市場調査、営業力強化施策推進及び会社PR（広報・宣伝、全社ホームページ）に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室企画部企画課', '企画','けいえいきかくしつきかくぶきかくか', '全社に於ける事業戦略･事業計画等に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室企画部', '企画部','けいえいきかくしつきかくぶ', '全社に於ける経営戦略等に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室資材部調達第二課', '調2','けいえいきかくしつしざいぶちょうたつだいにか', '全社のH/W(ライセンス･保守PKG含む)･外注(工事･保守･業務委託Ⅱ等)の原価企画支援並びにレンタル･リース契約を含む調達事務に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室資材部調達第一課', '調1','けいえいきかくしつしざいちょうたつだいいっか', '全社のS/W製外･外注(設計･業務委託Ⅰ)の原価企画支援並びに派遣契約を含む調達事務に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('経営企画室資材部企画課', '資企画','けいえいきかくしつしざいぶきかくか', '全社の資材調達計画策定並びに管理業務、調達企画に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('経営企画室資材部', '資材','けいえいきかくしつしざいぶ', '資材調達全般に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 2, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部', '金1シ1','きんゆうだいいちじぎょうぶしすてむだいいちぶ', 'MUFG各社向け情報システム及びセキュリティシステム分野の製品企画、受注前活動、システム開発、設計、製作及びシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:00:00', 0, NULL, 0, 2222222, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部第一課', '金1シ11','きんゆうだいいちじぎょうぶしすてむだいいちぶだいいっか', 'MUFG各社向け業務基盤及び業務システムの製品企画、受注前活動、システム開発及びシステム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-05 09:59:59.995000', 0, NULL, 0, 2222222, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部第二課', '金1シ12','きんゆうだいいちじぎょうぶしすてむだいいちぶだいにか', 'MUFG各社向け業務システム及び業務アプリケーションの製品企画、受注前活動、システム開発及びシステム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-06 09:59:59.995000', 0, NULL, 0, 4444444, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部第三課', '金1シ13','きんゆうだいいちじぎょうぶしすてむだいいちぶだいさんか', 'MUFG各社向けのセキュリティに関わる業務支援、受注前活動、システム開発、設計、製作及びシステム納入後のフォロー等システムエンジニアリングに関する事項。', '2024-06-07 09:59:59.995000', 0, NULL, 0, 4444444, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部第四課', '金1シ14','きんゆうだいいちじぎょうぶしすてむだいいちぶだいよんか', 'MUFG各社向けのセキュリティに関わる業務支援、受注前活動、システム開発、設計、製作及びシステム納入後のフォロー等システムエンジニアリングに関する事項。', '2024-06-08 09:59:59.995000', 0, NULL, 0, 5555555, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第一部第五課', '金1シ15','きんゆうだいいちじぎょうぶしすてむだいいちぶだいごか', 'MUFG各社向けのセキュリティに関わる業務支援、受注前活動、システム開発、設計、製作及びシステム納入後のフォロー等システムエンジニアリングに関する事項。', '2024-06-09 09:59:59.995000', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第三部', '金1シ3','きんゆうだいいちじぎょうぶしすてむだいさんぶ', '三菱UFJ信託銀行向けシステムの製品企画、受注前活動、システム開発、システム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-10 09:59:59.995000', 0, NULL, 0, 3333333, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第三部第一課', '金1シ31','きんゆうだいいちじぎょうぶしすてむだいさんぶだいいっか', '三菱UFJ信託銀行、日本マスタトラスト信託銀行及びシステム子会社向け情報システムの製品企画、受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-11 09:59:59.995000', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第四部', '金1シ4','きんゆうだいいちじぎょうぶしすてむだいよんぶ', '三菱UFJモルガンスタンレー証券及びシステム子会社向け情報システムの製品企画、受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-12 09:59:59.995000', 0, NULL, 0, 3333333, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第四部第一課', '金1シ41','きんゆうだいいちじぎょうぶしすてむだいよんぶだいいっか', '三菱UFJモルガンスタンレー証券向けのインターネットを中心としたシステム企画、受注前活動、システム開発、システム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-04 10:00:00', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第五部', '金1シ5','きんゆうだいいちじぎょうぶしすてむだいごぶ', '三菱UFJニコス向けシステムの製品企画、受注前活動、システム開発からシステム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-04 10:00:00', 0, NULL, 0, 3333333, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第五部第一課', '金1シ51','きんゆうだいいちじぎょうぶしすてむだいごぶだいいっか', '三菱UFJニコス向けネットワークシステムの製品企画、受注前活動、システム開発、設計、製作、システム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-05 09:59:59.995000', 0, NULL, 0, 4444444, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部システム第五部第二課', '金1シ52','きんゆうだいいちじぎょうぶしすてむだいごぶだいにか', '三菱UFJニコス向け情報システムの製品企画、受注前活動、システム開発からシステム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-06 09:59:59.995000', 0, NULL, 0, 2222222, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部MUFJ営業第一部', '金1MF営1','きんゆうだいいちじぎょうぶえむゆうえふじぇえいぎょうだいいちぶ', '三菱UFJ銀行向け情報ｼｽﾃﾑｿﾘｭｰｼｮﾝの販売、運用サービス提供、及びアフターケアに関する事項｡', '2024-06-04 10:00:00', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部MUFJ営業第二部', '金1MF営2','きんゆうだいいちじぎょうぶえむゆうえふじぇえいぎょうだいにぶ', '三菱UFJ信託銀行、三菱UFJモルガンスタンレー証券及び三菱UFJニコス向け情報システムソリューションの販売、運用サービス提供、及びアフターケアに関する事項｡', '2024-06-04 10:00:00', 0, NULL, 0, 5555555, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部ネットワーク統括部', 'N統括','きんゆうだいいちじぎょうぶねっとわーくとうかつぶ', 'MUFGネットワーク共同化、MUFG各社向け基幹ネットワーク全般のシステムエンジニアリングに関する事項。', '2024-06-04 10:00:00', 0, NULL, 0, 5555555, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部ネットワーク統括部第一課', 'N統括1','きんゆうだいいちじぎょうぶねっとわーくとうかつだいいっか', 'MUFGネットワーク共同化、MUFG各社向け基幹ネットワーク全般のシステムエンジニアリングに関する事項。', '2024-06-05 09:59:59.995000', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部ネットワーク統括部第二課', 'N統括2','きんゆうだいいちじぎょうぶねっとわーくとうかつだいにか', 'MUFGネットワーク共同化、MUFG各社向け基幹ネットワーク（主に外接、海外）のシステムエンジニアリングに関する事項。', '2024-06-06 09:59:59.995000', 0, NULL, 0, 3333333, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部ネットワーク統括部第三課', 'N統括3','きんゆうだいいちじぎょうぶねっとわーくとうかつだいさんか', 'MUFGネットワーク共同化、MUFG各社向け基幹ネットワーク（主に基幹、拠点）のシステムエンジニアリングに関する事項。', '2024-06-07 09:59:59.995000', 0, NULL, 0, 2222222, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第一事業部ネットワーク統括部第四課', 'N統括4','きんゆうだいいちじぎょうぶねっとわーくとうかつだいよんか', 'MUFGネットワーク共同化、MUFG各社向け基幹ネットワーク（主にMUMSS）のシステムエンジニアリングに関する事項。', '2024-06-08 09:59:59.995000', 0, NULL, 0, 5555555, 6);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部', '金2シ1','きんゆうだいにじぎょうぶしすてむだいいちぶ', 'TMNF HDに於ける情報システムおよびネットワーク等の製品企画、受注前活動、システム開発、設計、製作、システム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第二部', '金2シ2','きんゆうだいにじぎょうぶしすてむだいにぶ', '金融分野向け情報システムの製品企画、受注前活動、システム開発、システム納入後のフォロー等システムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第二部第一課', '金2シ21','きんゆうだいにじぎょうぶしすてむだいにぶだいいっか', '損保・生保に於ける情報システムの受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第二部第二課', '金2シ22','きんゆうだいにじぎょうぶしすてむだいにぶだいにか', '三菱HCキャピタル及び関連会社の情報システムの受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第二部第三課', '金2シ23','きんゆうだいにじぎょうぶしすてむだいにぶだいさんか', '金融第二事業部対応顧客　アコム、MHC、MY他に対するネットワークの企画･構想、提案、要件定義、基本設計を中心とするシステムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第二部MHCプロジェクト推進室', '金2シ2M','きんゆうだいにじぎょうぶしすてむえむえちしぷろじぇくとすいしんしつ', '三菱HCキャピタルの大型案件構築に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第一課', '金2シ11','きんゆうだいにじぎょうぶしすてむだいいちぶだいいっか', 'TMNFの、主に新規リホスト、新旅行、その他新規領域における情報システムの受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第二課', '金2シ12','きんゆうだいにじぎょうぶしすてむだいいちぶだいにか', 'TMNFの、主に既設損害部門、三次元等の領域における情報システムの受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第三課', '金2シ13','きんゆうだいにじぎょうぶしすてむだいいちぶだいさんか', 'TMNFに対するネットワークの企画･構想、提案、要件定義、開発、構築を中心とするシステムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第四課', '金2シ14','きんゆうだいにじぎょうぶしすてむだいいちぶだいよんか', 'TMNFに対するネットワークの客先支援、構築、運用保守を中心とするシステムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第五課', '金2シ15','きんゆうだいにじぎょうぶしすてむだいいちぶだいごか', 'TMNFに対する端末の運用、保守に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第六課', '金2シ16','きんゆうだいにじぎょうぶしすてむだいいちぶだいろっか', 'TMNFに対する端末の展開、構築に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 1111111,7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム第一部第七課', '金2シ17','きんゆうだいにじぎょうぶしすてむだいいちぶだいななか', 'TMNFグループに対する情報システムの受注前活動、システム開発からシステム納入後のフォロー等システムエンジアリングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第一部', '金融営1','きんゆうだいにじぎょうぶしすてむえいぎょうだいいちぶ', 'TMNF、TMHDグループに対する情報システムソリューションの販売及び当該分野の全国統括に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第一部第一課', '金融営11','きんゆうだいにじぎょうぶしすてむえいぎょうだいいちぶだいいっか', 'TMNF、TMHDグループに対する業務システム、端末システムを中心としたマーケティングと販売に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第一部第二課', '金融営12','きんゆうだいにじぎょうぶしすてむえいぎょうぶだいいちぶだいにか', 'TMNFに対するネットワーク、基盤、音声系を中心としたマーケティングと販売に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第二部', '金融営2','きんゆうだいにじぎょうぶしすてむえいぎょうだいにぶ', '三菱ＵＦＪファイナンシャル４社、ＴＭＮＦ以外の金融分野に向けた情報システムソリューションの販売及び当該分野の全国統括に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第二部第一課', '金融営21','きんゆうだいにじぎょうぶしすてむえいぎょうだいにぶだいいっか', 'アコム、NRK、他新規顧客等に対する情報システムのマーケティングと販売に関する事項｡及びBPOソリューションのマーケティングと販売に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第二部第二課', '金融営22','きんゆうだいにじぎょうぶしすてむえいぎょうだいにぶだいにか', '生命保険会社、他新規顧客等に対する情報システム拡販及びマーケティングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('金融第二事業部システム営業第二部第三課', '金融営23','きんゆうだいにじぎょうぶしすてむえいぎょうだいにぶだいさんか', '三菱HCキャピタル及び関連会社に対する情報システムのマーケティングと販売に関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 7);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('MDIS Service Cloud', 'MSC', 'えむでぃす さーびす くらうど', 'MDIS金融部門で開発・運用しているクラウドプラットフォーム.。', '2024-06-05 10:06:59.995000', 90, NULL, 2, 5555555, 7);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('労政課', '労政','ろうせいか', '人事と一緒に以下の業務を担当する：労働契約・社内規則、人事異動情報、目標管理・自己申告相関、資格試験、人事処遇概要、定年退職・シニア雇用', '2024-04-23 09:05:00', 70, NULL, 4, 3333333, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('ファミリートレーニング制度', 'ファミトレ','ふぁみりーととれーにんぐせいど', '以下を目的として各職場が自主的におこなう研修会のこと ア．職場における課題の共有/イ．職場が抱える課題の解決策立案/ウ．多様な意見・考えを知ることによる相互理解の 深化および視野拡大/エ．職場内コミュニケーションの活性化', '2024-06-04 10:05:00', 0, NULL, 0, 3333333, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('西日本総務G', '西総務','にしにほんそうむ', '中部オフィスと関西オフィスで構成され、業務内容は本社と同様。', '2024-02-28 17:10:00', 0, NULL, 0, 3333333, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('総務・健康課', '総健','そうむ・けんこうか', '以下の業務を担当する：安全衛生・防災、入館・セキュリティ、MDIS会、給食システム、慶弔関連、収入印紙手配関連、庶務', '2024-06-01 10:05:00', 0, NULL, 0, 1111111, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('人事課', '人事','じんじか', '労政と一緒に以下の業務を担当する：労働契約・社内規則、人事異動情報、目標管理・自己申告相関、資格試験、人事処遇概要、定年退職・シニア雇用', '2024-06-04 10:05:00', 0, NULL, 0, 2222222, 3, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('人材育成課', '育成', 'じんざいいくせいか', '以下の業務を担当する：社員教育、受講推奨講座一覧、eラーニング、HRMポータル、DX人材育成アカデミー、研修や人材育成', '2024-03-08 15:40:00', 0, NULL, 0, 1111111, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('シニア・サーティファイド・プロフェッショナル', 'SCP','しにあ・さーてぃふぁいど・ぷろふぇっしょなる','当社の事業領域において、極めて高度な専門性(知識、スキル、能 力)を駆使して、全社あるいは事本(事業部)の経営に重大な影響を及ぼすような役割を遂行し、業績改善及び経営体質の強化に貢献する者。', '2024-06-04 09:08:00', 0, NULL, 0, 1111111, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('サーティファイド・プロフェッショナル', 'CP','さーてぃふぁいど・ぷろふぇっしょなる', '当社の事業領域において，高度な専門性(知識、スキル、能力)を駆使して、特定技術分野で実質的リーダーの役割を遂行する者。', '2024-05-05 12:07:00', 0, NULL, 0, 1111111, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('キャリアサポート室', 'Cサ','きゃりあさぽーとしつ', '以下の業務を担当する：キャリアサポート室、エンゲージメント向上、次世代育成支援、女性活躍推進、ハラスメント防止。', '2024-05-04 13:09:00', 0, NULL, 0, 2222222, 3, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('エグゼクティブ・サーティファイド・プロフェッショナル', 'ECP','えぐぜくてぃぶ・さーてぃふぁいど・ぷろふぇっしょなる', '当社の事業領域において、極めて高度な専門性(知識、スキル、能力)を駆使して、業界トップレベルの技術力を発揮する者。全社の経営に重大な影響を及ぼすような役割を遂行するのみならず、業界の第一人者としての極めて高い技術力を発揮し全社をリードする者。', '2024-04-30 11:56:00', 0, NULL, 0, 4444444, 3);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('Cloud Center of Excellence', 'CCoE','くらうど せんたー おぶ えくせれんす', '組織全体がクラウドを使用してビジネスを変革するために活用できるクラウド戦略、ガバナンス、ベストプラクティスの開発と管理を担当する部門横断的なチーム。', '2024-05-01 11:55:59.995000', 0, NULL, 0, 1111111, 3);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第一課', 'MIND本・九','しゅっこうぶだいいっか','本社地区及び九州地区からMINDへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 1);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第二課', 'MIND中・西','しゅっこうぶだいにか', '中部地区及び関西地区からMINDへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 1);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第三課', 'MDSOL本・九','しゅっこうぶだいさんか', '本社地区及び九州地区からMDSOLへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 1);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第四課', 'MDSOL中・西','しゅっこうぶだいよんか', '中部地区及び関西地区からMDSOLへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 1);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第五課', 'MESW本・九','しゅっこうぶだいごか', '本社地区及び九州地区からMESWへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 1111111, 1);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('出向部第六課', 'MESW中・西','しゅこうぶだいろっか','中部地区及び関西地区からMESWへ出向した者の出向者管理に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 1);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('Working Information Network System', 'WINS','ワーキング　いんふぁめいしょん　ねっとわーく　しすてむ', '就業管理システムで日々入力した実働時間に対して、プロジェクトオーダー(WBS)ごとの実績工数を登録するシステム。工数管理や加工費の原価計上が行える。', '2024-06-07 10:56:00', 0, NULL, 0, 5555555, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('PANSER2', NULL,'ぱんさーつー', '調達区分(SW製外、外注<保守･工事･技術委託等>、HW購入)の全てのプロセスを共通ワークフローで処理する。', '2024-06-04 10:56:00', 0, NULL, 0, 2222222, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('MELTOPIA ', NULL,'めるとぴあ' , 'IS本が制作する情報媒体で、三菱電機オフィシャルサイトと冊子『MELTOPIA』で展開している。', '2024-06-06 10:56:00', 80, NULL, 3, 2222222, 2);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('e-staffing', NULL,'いーすたっふぃんぐ', '企業の派遣利用に関連して発生する業務の悩みを解決するWebベース の人材派遣一括管理システム。', '2024-06-05 10:56:00', 0, NULL, 0, 2222222, 2);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('情報漏洩防止基盤システム', 'DLP', 'じょうほうろうえいぼうしきばんしすてむ', 'メールやWebの書込みを走査することにより、個人情報や機密情報の漏洩を防ぐためのシステム。', '2024-06-04 12:51:00', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('ログ分析システム', 'LAS', 'ろぐぶんせきしすてむ', 'ネットワーク機器やサーバが出力するログを収集し、「外部からの攻撃及び予兆の検知」、「インシデントの事後調査」、「システム障害発生時の原因究明」に繋げるための分析を行うシステム。', '2024-06-04 12:51:00', 0, NULL, 0, 1111111, 6);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('プロジェクト・マネジメント室', 'PMO','ぷろじぇくと・まねじめんとしつ', '経営上重要な(規模､戦略性､リスク等の面で)プロジェクトに関して、成功裡に完了する様、提案から完了まで、全社視点でプロジェクトに対する管理・指導・支援を実施する。', '2024-05-09 12:07:00', 0, NULL, 0, 2222222, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('品質保証部', '品証','ひんしつほしょうぶ', '企画課、生産技術課で構成される。セキュリティのトラブル対応、注意喚起・教育、プロジェクト支援などの業務を担当する。', '2024-05-07 12:07:00', 0, NULL, 0, 1111111, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('生産システム部', '生産シ','せいさんしすてむぶ', '社内インフラ(各種申請・手続き案内)、社内情報システム(システム利用申請・操作方法)、施設・設備(各種申請・手続き案内)などの業務を担当する。', '2024-05-08 12:07:00', 0, NULL, 0, 4444444, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('技術部', '技術','ぎじゅつぶ', '技術知財企画課、開発課、デザイン課で構成される。開発/知的財産権、提案/商談関連情報提供、などの業務を担当する。', '2024-05-06 12:07:00', 60, NULL, 5, 5555555, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('nokos', NULL, 'のこす', 'Teams・Zoom の通話/会議を強制的に録音するシステム。', '2024-05-07 12:07:00', 0, NULL, 0, 4444444, 8, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部ビジネスデジタルマーケティング推進室', 'DM推','でいえくすそりゅーしょんじぎょうぶびじねすでじたるまーけてぃんぐすいしんしつ', '金融分野の事業部に向けた市場調査、販売促進、広報等マーケティング、プリセールスに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部ビジネスデジタルトランスフォーメーション推進室', 'DX推','でいえくすそりゅーしょんじぎょうぶびじねすでじたるとらんすふぉーめーしょんすいしんしつ', '社内のデジタルトランスフォーメーション(DX)化による業務改革立案とその推進、DX人材育成、講座・コミュニティ運営、認定資格取得に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部ビジネスデータ・ストラテジーグループ', 'DSG','でいえくすそりゅーしょんじぎょうぶびじねすでーた・すとらてじーぐるーぷ', 'DXソリューションサービス技術(データ利活用、AI等)の企画・調査、開発に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部ビジネスイノベーション推進部', 'BI推','でいえくすそりゅーしょんじぎょうぶびじねすいのべーしょんすいしんぶ', '金融分野の事業拡大･高度化に向けた新規ソリューションやビジネスモデルの構想･企画･創出に関する事項及び既存事業分野に対する提案・コンサルテーション・受注前活動に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部クラウド事業推進室', 'CL推','でいえくすそりゅーしょんじぎょうぶくらうどじぎょうすいしんしつ' , 'クラウドビジネスの事業企画、社外対応、人材育成、提案・営業支援及び受注前活動に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューション営業部', 'DX営','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんえいぎょうぶ', 'ソリューション事業の企画、販売及びマーケティングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューション営業部第一課', 'DX営1','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんえいぎょうぶだいいっか', '新ソリューションの立上げ、企画、販売、マーケティング及び三菱電機グループ向け案件全般の営業に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 3333333, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューション営業部第二課', 'DX営2','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんえいぎょうぶだいにか', '音声系ソリューションの企画、販売、マーケティング及び証券会社(三菱ＵＦＪモルガン･スタンレー証券は除く)向け案件全般の営業に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューション営業部第三課', 'DX営3','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんえいぎょうぶだいさんか', 'セキュリティコンポーネント販売、サービスビジネスの企画及び顧客開拓、並びにヘルスケア事業に関するシステムパッケージ販売及びマーケティングに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 5555555, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューションシステム部', 'DXシ','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんしすてむぶ', 'ソリューション事業の製品企画、受注前活動、システム開発、設計、製作、システム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューションシステム部第一課', 'DXシ1','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんしすてむぶだいいっか', 'ディーリングフォンシステム、音声認識及び新ソリューションの製品企画、受注前活動、システム開発、設計、製作、システム納入後のフォロー等システムエンジニアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューションシステム部第二課', 'DXシ2','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんしすてむぶだいにか','通話録音システムの製品企画、受注前活動、システム開発、設計、製作、システム納入後のフォロー及び証券会社(三菱ＵＦＪモルガン･スタンレー証券は除く)向け案件全般のシステムエンジアリングに関する事項｡', '2024-06-04 10:07:00', 0, NULL, 0, 4444444, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューションシステム部開発第一グループ', 'DX開1','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんしすてむぶかいはつだいいちぐるーぷ', 'サービスクラウド基盤の企画、開発に関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 8);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('DXソリューション事業部DXソリューションシステム部開発第二グループ', 'DX開2','でいえくすそりゅーしょんじぎょうぶでいえくすそりゅーしょんしすてむぶかいはつだいにぐるーぷ' , 'セキュリティコンポーネントの企画、開発及びヘルスケア向けソリューションに関する事項。', '2024-06-04 10:07:00', 0, NULL, 0, 2222222, 8);
+
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES ('電気用品', NULL,'でんきようひん', '電気事業法にいう一般電気工作物の部分となり、又はこれに接続して用いられる機械、器具又は材料。', '2024-06-05 10:06:59.995000', 0, NULL, 0, 5555555, 4, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('特定電気用品', NULL,'とくていでんきようひん', '構造又は使用方法その他の使用状況からみて特に危険又は障害の発生するおそれが多い電気用品。', '2024-06-06 10:06:59.995000', 0, NULL, 0, 3333333, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('消費生活用製品', NULL,'しょうひせいかつようせいひん', '主として一般消費者の生活の用に供される製品。すなわち、一般消費者の生活の用に供される目的で、通常、市場で一般消費者に販売されている製品は、すべて消安法の対象製品となります。', '2024-06-07 10:06:59.995000', 0, NULL, 0, 2222222, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('製品事故', NULL,'せいひんじこ', '消費生活用製品の使用に伴い生じた事故のうち、①一般消費者の生命又は身体に対する危害が発生した事故。②消費生活用製品が滅失し、又はき損した事故であって、一般消費者の生命又は身体に対する危害が発生するおそれのあるもののいずれかに詷するものであって、消費生活用製品の欠陥によって生じたものでないことが明らかな事故以外のものと規定されています。(消安法第2条第4項)', '2024-06-08 10:06:59.995000', 2, NULL, 1, 5555555, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('重大製品事故', NULL,'じゅうだいせいひんじこ', '製品事故のうち、発生し、又は発生するおそれがある危害が重大であるものとして、当該危害の内容又は事故の態様に関し政令で定める要件に該当するもの。(消安法 第5条)具体的には、以下の①及び②に示される危害が発生するような製品事故は、重大製品事故と判断されます。①一般消費者の生命又は身体に対する危害が発生した事故のうち、危害が重大であるもの。死亡事故、重傷病事故(治療に要する期間が30日以上の負傷・疾病)後遺障害事故、一酸化炭素中毒事故②消費生活用製品が滅失し、又はき損した事故であって、一般消費者の生命又は身体に対する重大な危害が生ずるおそれのあるもの。火災（消防が確認したもの）', '2024-06-09 10:06:59.995000', 0, NULL, 0, 4444444, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('情報セキュリティ事故',NULL,'じょうほうせきゅりてぃじこ', '当社が管理責任を有する情報資産(個人情報を含む)の紛失・盗難・漏えい等が発生、及び、その恐れにより、当社あるいは顧客・当該本人へ損害をもたらす可能性のある出来事が発生した場合。', '2024-06-10 10:06:59.995000', 0, NULL, 0, 1111111, 4);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('サイバーセキュリティ事故',NULL,'さいばーせきゅりてぃじこ', '個人情報に係るの事故で、偶発的又は違法な、紛失・盗難・破壊・改変・不正アクセス・不正使用/開示など、個人データの安全性に対する侵害が発生した場合、当社が情報資産の取扱いを業務委託した委託先にて、サイバー攻撃が起因するもの以外の上記事故が発生した場合。', '2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 4);
+
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('人工知能', 'AI', 'じんこうちのう', '人間の知能を模倣し、認識や推論、問題解決などのタスクを自動化する技術。', '2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES ('機械学習 (Machine Learning)',NULL,'きかいがくしゅう', 'データからパターンや規則性を学習し、予測や意思決定を行うアルゴリズムや手法。', '2024-06-11 11:53:59', 0, NULL, 0, 1111111, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('パターン認識 (Pattern Recognition)',NULL , 'ぱたーんにんしき','データ中のパターンや規則性を識別し、分類する技術。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('自然言語処理 (Natural Language Processing)','NLP','しぜんげんごしょり', '人間の言語を理解し、生成するための技術やアルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL,0 , 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('強化学習 (Reinforcement Learning)',NULL ,'きょうかがくしゅう', '環境との相互作用を通じて、報酬を最大化するための学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('画像認識 (Image Recognition)',NULL ,'がぞうにんしき' ,'画像中の物体や特徴を識別する技術やアルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('音声認識 (Speech Recognition)',NULL ,'おんせいにんしき' ,'音声をテキストに変換する技術やアルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('データマイニング (Data Mining)',NULL ,'でーたまいにんぐ' ,'大量のデータから有益な情報やパターンを抽出する過程や手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ビッグデータ (Big Data)',NULL ,'びっぐでーた' ,'膨大な量や多様な種類のデータを扱う技術やアプローチ。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('予測分析 (Predictive Analytics)',NULL , 'よそくぶんせき','過去のデータから未来の出来事を予測するための手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('教師あり学習 (Supervised Learning)',NULL ,'きょうしありがくしゅう' ,'ラベル付きのトレーニングデータを使用して、入力と出力の関係を学習する機械学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('教師なし学習 (Unsupervised Learning)',NULL ,'きょうしなしがくしゅう' ,'ラベルのないトレーニングデータからパターンや構造を発見する機械学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('半教師あり学習 (Semi-Supervised Learning)',NULL ,'はんきょうしありがくしゅう ','一部のデータにラベルが付与されている場合に、それを活用してモデルを学習する手法。','2024-06-11 10:06:59.995000',0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('転移学習 (Transfer Learning)',NULL ,'てんいがくしゅう' ,'あるタスクで学習された知識やモデルを、別の関連タスクに転用する学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('クラスタリング (Clustering)',NULL ,'くらすたりんぐ' ,'似た特徴を持つデータポイントをグループ化する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('分類 (Classification)',NULL ,'ぶんるい' ,'データを予め定義されたカテゴリやクラスに分類する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('回帰分析 (Regression Analysis)',NULL ,'かいきぶんせき' ,'変数間の関係を調査し、連続値を予測する統計的手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('決定木 (Decision Tree)',NULL, 'けっていぎ','分類や回帰を行うための木構造のモデル。','2024-06-11 10:06:59.995000', 20, NULL, 9, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ランダムフォレスト (Random Forest)',NULL ,'らんだむふぉれすと' ,'複数の決定木を組み合わせたアンサンブル学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('サポートベクターマシン (Support Vector Machine)','SVM','さぽーとべくたーましん' ,'分類や回帰に使用される教師あり学習アルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ニューラルネットワーク (Neural Network)',NULL ,'にゅーらるねっとわーく' ,'脳の神経細胞のモデルを模倣した機械学習アルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('深層強化学習 (Deep Reinforcement Learning)',NULL ,'しんそうきょうかがくしゅう' ,'多層のニューラルネットワークを用いた強化学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('バックプロパゲーション (Backpropagation)',NULL ,'ばっくぷろばけーしょん' ,'ニューラルネットワークにおいて、誤差を逆伝播させて重みを更新するアルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('勾配降下法 (Gradient Descent)',NULL ,'こうばいこうかほう' ,'最適なパラメータを探索するために、目的関数の勾配を使って重みを更新する最適化アルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES('学習率 (Learning Rate)',NULL ,'がくしゅうりつ' ,'勾配降下法で重みを更新する際のステップの大きさを決定するハイパーパラメータ。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('バッチ学習 (Batch Learning)',NULL ,'ばっちがくしゅう' ,'全てのトレーニングデータを一度に使ってモデルを学習する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('オンライン学習 (Online Learning)',NULL ,'おんらいんがくしゅう' ,'新しいデータが到着するたびに、モデルを逐次的に更新する学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('アンサンブル学習 (Ensemble Learning)',NULL ,'あんさんぶるがくしゅう' ,'複数のモデルを組み合わせてより強力なモデルを作る学習手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+ INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ユーザーエクスペリエンス (User Experience)','UX' ,'ゆーざーえくすりぺんす' ,'ユーザーが製品やサービスを利用する際の全体的な体験。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ロボティクス (Robotics)',NULL ,'ろぼてぃっくす' ,'機械やコンピュータープログラムを用いて物理的なタスクを実行する分野。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('エージェント (Agent)',NULL ,'えーじぇんと' ,'環境とやり取りをする、学習または行動する実体。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('環境 (Environment)',NULL ,'かんきょう' ,'エージェントが存在する、外部の状況や状態。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ポリシー (Policy)',NULL , 'ぽりしー','強化学習において、エージェントの行動を規定する戦略や規則。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('報酬関数 (Reward Function)',NULL ,'ほうしゅうかんすう' ,'強化学習において、エージェントが環境から受け取る報酬の基準。','2024-06-11 10:06:59.995000', 50, NULL, 6, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES('Q学習 (Q-Learning)',NULL ,'きゅーがくしゅう' ,'強化学習の一種で、行動価値関数を学習する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('デュアルネットワークアーキテクチャ (Dual Network Architecture)','DNN' ,'でゅあるねっとわーくあーきてくちゃ' ,'ゲームなどの強化学習タスクで使用されるネットワークの構造。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('自己符号化器 (Autoencoder)',NULL ,'じこふごうき' ,'入力データを高次元の潜在空間に変換し、元のデータを再構築するニューラルネットワークの構造。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('強化学習エージェント (RL Agent)',NULL ,'きょうかがくしゅうえーじぇんと' ,'強化学習において環境と相互作用し、行動を選択するエンティティ。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('パラメータ (Parameter)',NULL ,'ぱらめーた' ,'モデルにおいて学習される重みやバイアスなどの値。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ハイパーパラメータ (Hyperparameter)',NULL ,'はいぱーぱらめーた' ,'モデルの学習プロセスや構造を制御する、事前に設定される値。','2024-06-11 10:06:59.995000',0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('モデル (Model)',NULL ,'もでる','データのパターンや関係性を表現する機械学習アルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('データセット (Dataset)',NULL ,'でーたせっと' ,'モデルの学習や評価に使用される、データの集合。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('トレーニングデータ (Training Data)',NULL ,'とれーにんぐでーた' ,'モデルの学習に使用されるデータセットの一部。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('テストデータ (Test Data)',NULL ,'てすとでーた' ,'モデルの性能を評価するために使用されるデータセットの一部。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('検証データ (Validation Data)',NULL ,'けんしょうでーた' ,'モデルのハイパーパラメータを調整するために使用されるデータセットの一部。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('フィーチャー (Feature)',NULL ,'ふぃーちゃー' ,'データの特徴や属性。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ラベル (Label)',NULL ,'らべる' ,'教師あり学習において、トレーニングデータポイントに対する正解のカテゴリや値。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('オーバーフィッティング (Overfitting)',NULL ,'おーばーふぃってぃんぐ' ,'モデルがトレーニングデータに過度に適合し、汎化性能が低下する現象。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('アンダーフィッティング (Underfitting)',NULL ,'あんだーふぃってぃんぐ' ,'モデルがトレーニングデータに適合不足であり、十分な性能を発揮しない現象。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('正規化 (Regularization)',NULL ,'せいきか' ,'モデルの過学習を防ぐために、モデルの複雑さにペナルティを課す手法。','2024-06-11 10:06:59.995000', 40, NULL, 7, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ドロップアウト (Dropout)',NULL ,'どろっぷあうと' ,'ニューラルネットワークにおいて、一部のユニットをランダムに無効化することで過学習を抑制する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('バッチ正規化 (Batch Normalization)',NULL ,'ばっちせいきか' ,'ニューラルネットワークの学習を安定化させるための手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('モデル評価指標 (Model Evaluation Metrics)',NULL ,'もでるひょうかしひょう' ,'モデルの性能を評価するための指標や尺度。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('精度 (Accuracy)',NULL ,'せいど' ,'分類モデルの正しく分類されたデータポイントの割合。','2024-06-11 10:06:59.995000', 30, NULL, 8, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('適合率 (Precision)',NULL ,'てきごうりつ' ,'陽性クラスと予測されたデータポイントの中で、実際に陽性である割合。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('再現率 (Recall)',NULL ,'さいげんりつ' ,'実際の陽性クラスの中で、正しく陽性と予測されたデータポイントの割合。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('F1スコア (F1 Score)',NULL ,'えふわんすこあ' ,'適合率と再現率の調和平均であり、クラス分類モデルの総合的な性能を評価する指標。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('混同行列 (Confusion Matrix)',NULL ,'こんどうぎょうれつ' ,'分類モデルの性能を評価するための表形式の行列。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ROC曲線 (ROC Curve)',NULL ,'あーるおーしーきょくせん' ,'分類モデルの性能を視覚的に評価するための曲線。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Root Mean Square Error','RMSE' ,'るーとみーんすくえあえらー' ,'回帰モデルの予測と実際の値の間の平均二乗誤差の平方根。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Mean Absolute Error','MAE' ,'みーんあぶそるとえらー' ,'回帰モデルの予測と実際の値の間の平均絶対誤差。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Mean Squared Error','MSE' ,'みーんすくえあえらー' ,'回帰モデルの予測と実際の値の間の平均二乗誤差。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('R2スコア',NULL ,'あーるつーすこあ' ,'回帰モデルの予測の良さを示す指標。','2024-06-11 10:06:59.995000', 10, NULL, 10, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('クロスバリデーション (Cross-Validation)',NULL ,'くろすばりでーしょん' ,'モデルの性能を評価するために、複数のトレーニングデータとテストデータの組み合わせを用いる手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('k-分割交差検証 (k-Fold Cross-Validation)',NULL ,'けーぶんかつこうさけんしょう' ,'データセットをk個のサブセットに分割し、k-1個をトレーニングに、残り1個をテストに使用する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ハイパーパラメータチューニング (Hyperparameter Tuning)',NULL ,'はいぱーぱらめーたちゅーにんぐ' ,'モデルの性能を最適化するために、ハイパーパラメータの最適な値を探索する手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('グリッドサーチ (Grid Search)',NULL ,'ぐりっとさーち' ,'ハイパーパラメータチューニングの一手法で、候補となるハイパーパラメータの組み合わせを全て試す方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ランダムサーチ (Random Search)',NULL ,'らんだむさーち' ,'グリッドサーチの一手法で、ハイパーパラメータをランダムに選択して探索する方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES('ベイズ最適化 (Bayesian Optimization)',NULL ,'べいずさいてきか' ,'ハイパーパラメータチューニングの一手法で、事前の情報を用いて効率的に最適なパラメータを探索する方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('モデルデプロイメント (Model Deployment)',NULL ,'もでるでぷろいめんと' ,'学習済みモデルを実際の環境に導入し、実用化するプロセス。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('インフェレンス (Inference)',NULL ,'いんふぇれんす' ,'学習済みモデルを使用して新しいデータに対する予測や分類を行うプロセス。','2024-06-11 10:06:59.995000', 3, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('アプリケーションプログラミングインターフェース (API : Application Programming Interface)',NULL ,'あぷりけーしょんぷろぐらみんぐいんたーふぇーす' ,'ソフトウェア同士が相互に通信するための規約や手順。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('バッチ処理 (Batch Processing)',NULL,'ばっちしょり' ,'一定量のデータをまとめて処理する方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('リアルタイム処理 (Real-Time Processing)',NULL ,'りあるたいむしょり' ,'データを即座に処理し、迅速な反応を返す方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('マイクロサービス (Microservices)',NULL ,'まいくろさーびす' ,'小規模で独立した機能を持つソフト。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('コンテナ化 (Containerization)',NULL ,'こんてなか' ,'ソフトウェアやアプリケーションを環境から独立して実行する技術。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('クラウドコンピューティング (Cloud Computing)',NULL ,'くらうどこんぴゅーてぃんぐ' ,'インターネットを通じてリソースやサービスを提供するコンピューティングの形態。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('スケーラビリティ (Scalability)',NULL ,'すけーらびりてぃ' ,'システムやアプリケーションの拡張性や拡張可能性。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ハードウェアアクセラレーション (Hardware Acceleration)',NULL ,'はーどうぇああくせられーしょん' ,'ソフトウェア処理を高速化するためにハードウェアを使用する技術。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('パラレル処理 (Parallel Processing)',NULL ,'ぱられるしょり' ,'複数の処理要素が同時に実行される処理方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('分散処理 (Distributed Processing)',NULL ,'ぶんさんしょり' ,'複数のコンピューター間で処理を分割して実行する方法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('グリッドコンピューティング (Grid Computing)',NULL ,'ぐりっとこんぴゅーてぃんぐ' ,'複数のコンピューターを組み合わせて、大規模な計算リソースを提供する技術。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('クラウドストレージ (Cloud Storage)',NULL ,'くらうどすとれーじ' ,'インターネットを通じてデータを保存するためのオンラインストレージサービス。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('レプリケーション (Replication)',NULL ,'れぷりけーしょん' ,'データやシステムを複数の場所に複製することで、可用性や信頼性を向上させる技術。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('バックアップ (Backup)',NULL ,'ばっくあっぷ' ,'データやシステムのコピーを作成して、災害からの復旧やデータの保護を目的とする手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('データセキュリティ (Data Security)',NULL ,'でーたせきゅりてぃ' ,'データの機密性や整合性、可用性を確保するための技術や手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Generative Adversarial Network','GAN' ,'じぇねれいてぃぶあどばーせありあるねっとわーく' ,'ディープラーニングの一種で、生成器と識別器が競い合うネットワーク構造。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Convolutional Neural Network','CNN' ,'こんぼらてぃなおるにゅーらるねっとわーく' ,'画像認識などに用いられる、畳み込み層を持つニューラルネットワークの構造。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Recurrent Neural Network','RNN' ,'れかれんとにゅーらるねっとわーく' ,'時系列データや系列データを処理するためのニューラルネットワークの構造。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Long Short-Term Memory','LSTM' ,'ろんぐしょーとたーむめもりー' ,'RNNの一種で、長期的な依存関係を学習するためのメカニズムを持つモデル。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('Gated Recurrent Unit','GRU' ,'げーてぃどれかれんとゆにっと' ,'LSTMと同様に時系列データを処理するためのRNNの一種。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id, key_term)
+VALUES('データウェアハウス',NULL ,'でーたうぇあはうす' ,'企業内のデータを時系列に蓄積して業務横断的に活用できるデータサーバー。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12, TRUE);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ディストリビューテッドデニアルオブサービス (DDoS) 攻撃 (Distributed Denial of Service Attack)','DDos攻撃','でぃれくとりびゅーてっどでにあるおぶさーびす' ,'複数のコンピューターを使用して、ネットワークやサーバーに対してトラフィックを洪水のように送り、サービスを停止させる攻撃手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ディープラーニング (Deep Learning)',NULL ,'でぃーぷらーにんぐ','多層のニューラルネットワークを用いて複雑なパターンを学習する機械学習の一分野。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('ゼロデイ攻撃 (Zero-Day Attack)',NULL ,'ぜろでいこうげき' ,'セキュリティホールを利用して攻撃する際、その脆弱性がまだ修正されていない状態で攻撃を行うこと。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セッションハイジャック (Session Hijacking)',NULL ,'せっしょんはいじゃっく' ,'有効なセッションを乗っ取り、悪意のある行動を行う攻撃手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティログ (Security Log)',NULL ,'せきゅりてぃろぐ' ,'システムやネットワークのセキュリティに関するイベントを記録したログ。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティポリシー強化 (Security Policy Enforcement)',NULL ,'せきゅりてぃぽりしーきょうか' ,'企業や組織がセキュリティを確保するための方針や規則。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティポリシー (Security Policy)',NULL ,'せきゅりてぃぽりしー' ,'企業や組織がセキュリティを確保するための方針や規則。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティベストプラクティス (Security Best Practices)',NULL ,'せきゅりてぃべすとぷらくてぃす' ,'セキュリティを向上させるための推奨される方法や手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティパッチ (Security Patch)',NULL ,'せきゅりてぃぱっち' ,'システムやソフトウェアの脆弱性を修正するための修正プログラム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティテスト (Security Testing)',NULL ,'せきゅりてぃてすと' ,'システムやアプリケーションのセキュリティを評価するテスト。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティアップデート (Security Update)',NULL ,'せきゅりてぃあっぷでーと' ,'システムやソフトウェアに対するセキュリティの脆弱性を修正するための更新プログラム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュリティアッセス管理 (Security Access Management)',NULL ,'せきゅりてぃあっせすかんり' ,'ユーザーのアクセス権限を管理するプロセス。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('セキュアコーディング (Secure Coding)',NULL,'せきゅあこーでぃんぐ' ,'ソフトウェアを開発する際にセキュリティを考慮したコーディング手法。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('シングルサインオン (Single Sign-On)',NULL ,'しんぐるさいおん' ,'複数のシステムやアプリケーションに一度の認証でアクセスする仕組み。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('シリアルスクランブリング (Serial Scrambling)',NULL ,'しりあるすくらんぶりんぐ' ,'データを送信する際に、シリアルデータのビットをランダムに並び替えることでセキュリティを向上させる。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('サポートベクターマシン (Support Vector Machine, SVM)',NULL ,'さぽーとべくたーましん' ,'分類や回帰に使用される教師あり学習アルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('コンピュータビジョン (Computer Vision)',NULL ,'こんぴゅーたびじょん' ,'コンピューターに視覚情報を処理し、理解させるための技術やアルゴリズム。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+INSERT INTO terms (term_name, abbreviation, reading, definition, created_date, search_count, request_date, helped_count, last_editor, department_id)
+VALUES('可用性 (Availability)',NULL ,'かようせい' ,'システムなどが使用できる状態を維持し続ける能力。必要なときに使用可能な状態が継続されている度合いを表したもの。','2024-06-11 10:06:59.995000', 0, NULL, 0, 2222222, 12);
+
+UPDATE terms SET abbreviation = '' WHERE abbreviation IS NULL;
+
+
+
+
+
